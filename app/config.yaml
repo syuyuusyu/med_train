@@ -1,0 +1,14 @@
+app:
+  datasource:
+    host: 111,
+    user: bqm,
+    password: 111,
+    database": bqm
+  hpNames:
+    415: 昭通市中医医院,
+    416ES: 昭通市第一人民医院,
+    YLV21051: 昆明医科大学第一附属医院(西昌路院区),
+    yd_cg: 昆明医科大学第一附属医院(呈贡院区),
+    skin: 昆明皮肤病医院
+  loadHps:
+    - 415

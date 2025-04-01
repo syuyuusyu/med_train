@@ -36,3 +36,30 @@ inputs = tokenizer(input_text, return_tensors="pt", max_length=512, truncation=T
 generated = model.generate(**inputs, max_length=100)
 answer = tokenizer.decode(generated[0], skip_special_tokens=True)
 print("生成的答案:", answer)
+
+
+from sentence_transformers import SentenceTransformer
+from transformers import RagTokenizer, RagRetriever, RagTokenForGeneration
+import numpy as np
+
+# 假设 chunks 已准备好（1 万字文档分块）
+chunks = [...]  # 你的分块结果
+
+# 嵌入文档片段
+embedder = SentenceTransformer("all-MiniLM-L6-v2")
+embeddings = embedder.encode(chunks, convert_to_tensor=True)
+embeddings_np = embeddings.cpu().numpy()
+
+# 加载 RAG 模型
+tokenizer = RagTokenizer.from_pretrained("facebook/rag-token-nq")
+retriever = RagRetriever.from_pretrained("facebook/rag-token-nq", index_name="custom", passages=chunks, embeddings=embeddings_np)
+model = RagTokenForGeneration.from_pretrained("facebook/rag-token-nq", retriever=retriever)
+
+# 用户问题
+query = "文件中有哪些关键信息？"
+
+# 直接生成答案
+inputs = tokenizer(query, return_tensors="pt")
+generated = model.generate(**inputs)
+answer = tokenizer.batch_decode(generated, skip_special_tokens=True)[0]
+print("生成的答案:", answer)
